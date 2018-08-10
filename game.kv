@@ -1,0 +1,42 @@
+#: import Spinner kivy.uix.spinner
+#: import Slider kivy.uix.slider
+
+ToolBar:
+
+<Toolbar>
+    orientation: "horizontal"
+    size_hint: None,None
+    spacing: '5dp'
+    padding: '5dp'
+    pos: (0,550)
+    Label:
+        text: "Placing:"
+        size_hint: None,None
+        height: '35dp'
+        width: '70dp'
+    Spinner:
+        text: "Live cell"
+        values: ["Live cell","Dead cell"]
+        id: spinner_id
+        on_text: root.spinner_clicked(spinner_id.text)
+        size_hint: None,None
+        height: '35dp'
+        sync_height: True
+    Button:
+        text: "Randomize Grid"
+        on_press: root.randomize()
+        height: '35dp'
+        size_hint: None,None
+        width: '120dp'
+    Button:
+        text: "Clear Grid"
+        on_press: root.clear()
+        height: '35dp'
+        size_hint: None,None
+        width: '100dp'
+    Button:
+        text: "Simulate!"
+        on_press: root.sim()
+        height: '35dp'
+        size_hint: None,None
+        width: '90dp'

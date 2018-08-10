@@ -9,6 +9,9 @@ from kivy.clock import Clock
 from functools import partial
 from kivy.config import Config
 
+from random import randint
+import time
+
 
 Config.set('input','mouse','mouse,multitouch_on_demand')
 Config.set('graphics', 'width', '900')
@@ -34,10 +37,12 @@ grid = [[node(j * hori, i * vert, hori - 1, vert - 1) for j in range(width)] for
 colour = [1]
 colours = [(1,1,1,1),(0,0,0,1)]
 
-interval = [0.5]
+interval = [0.1]
 wrap = [1]
 rules = [2,3,3]
 
+
+running = [0]
 
 def paint(x,y,self):
     hori = grid[0][0].hori
@@ -54,7 +59,7 @@ def paint(x,y,self):
 
 
 def updateBoard(self):
-    self.canvas.clear()
+
     with self.canvas:
         Color(.501,.501,.501,1)
         Rectangle(pos=(0,0),size=(900,540))
@@ -64,7 +69,19 @@ def updateBoard(self):
                 Rectangle(pos=(j.x, j.y), size=(j.hori, j.vert))
 
 
+def resetCanvas(self):
+    self.canvas.clear()
+    #self.canvas.children = [widget.canvas for widget in self.children]
+    updateBoard(self)
+    '''self.clear_widgets()
+    self.add_widget(Touch())
+    tools = ToolBar()
+    self.add_widget(tools)'''
+
+
 def simulate(self,*largs):
+    if not running[0]:
+        return
     N,M = len(grid),len(grid[0])
     grid2 = [[None for x in range(M)] for x in range(N)]
     for i in range(N):
@@ -95,10 +112,17 @@ def simulate(self,*largs):
                 grid2[i][j].col = 1
             else:
                 grid2[i][j].col = grid[i][j].col
+            if grid[i][j].col != grid2[i][j].col:
+                with self.canvas:
+                    Color(*colours[grid2[i][j].col])
+                    Rectangle(pos=(grid[i][j].x, grid[i][j].y), size=(grid[i][j].hori, grid[i][j].vert))
+
     for i in range(N):
         for j in range(M):
             grid[i][j] = grid2[i][j]
-    updateBoard(self)
+
+    resetCanvas(self)
+
     Clock.schedule_once(partial(simulate,self),interval[0])
 
 
@@ -108,36 +132,61 @@ class Touch(Widget):
     def on_touch_down(self, touch):
         x = touch.x
         y = touch.y
-        paint(x,y,self.parent)
+        paint(x,y,self)
 
     def on_touch_move(self, touch):
         x = touch.x
         y = touch.y
-        paint(x,y,self.parent)
-        simulate(self.parent)
+        paint(x,y,self)
 
 
 class ToolBar(BoxLayout):
-    pass
+
+    def spinner_clicked(self,value):
+        if value=='Live':
+            colour[0] = 1
+        else:
+            colour[0] = 0
+
+    def sim(self):
+        running[0] = 1
+        simulate(self.children[0])
+
+    def clear(self):
+        running[0] = 0
+        for i in grid:
+            for j in i:
+                j.col = 0
+        resetCanvas(self.children[0])
+
+    def randomize(self):
+        running[0] = 0
+        print ("YES")
+        for i in grid:
+            for j in i:
+                if randint(1,3)==1:
+                    j.col = 1
+                else:
+                    j.col = 0
+        resetCanvas(self.children[0])
+
 
 
 class GameApp(App):
     def build(self):
         self.title = "Conway's Game of Life Simulator"
-        parent = Widget()
-        draw = Touch()
         tools = ToolBar()
-        parent.add_widget(draw)
-        parent.add_widget(tools)
-        with parent.canvas:
+        draw = Touch()
+        with draw.canvas:
             Color(.501, .501, .501, 1)
             Rectangle(pos=(0, 0), size=(900, 540))
-        with parent.canvas:
+        with draw.canvas:
             Color(1,1,1,1)
             for i in range(30):
                 for j in range(50):
                     Rectangle(pos=(grid[i][j].x, grid[i][j].y), size=(grid[i][j].hori, grid[i][j].vert))
-        return parent
+        tools.add_widget(draw)
+        return tools
 
 
 if __name__ == "__main__":
