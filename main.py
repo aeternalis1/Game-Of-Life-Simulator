@@ -8,6 +8,7 @@ from kivy.graphics import *
 from kivy.clock import Clock
 from functools import partial
 from kivy.config import Config
+from kivy.properties import StringProperty
 
 from random import randint
 import time
@@ -43,6 +44,7 @@ rules = [2,3,3]
 
 
 running = [0]
+gen = [0]
 
 def paint(x,y,self):
     hori = grid[0][0].hori
@@ -67,6 +69,16 @@ def updateBoard(self):
             for j in i:
                 Color(*colours[j.col])
                 Rectangle(pos=(j.x, j.y), size=(j.hori, j.vert))
+
+    alive = 0
+
+    for i in grid:
+        for j in i:
+            if j.col:
+                alive += 1
+
+    self.parent.atext = str(alive)
+    self.parent.gtext = str(gen[0])
 
 
 def resetCanvas(self):
@@ -112,15 +124,12 @@ def simulate(self,*largs):
                 grid2[i][j].col = 1
             else:
                 grid2[i][j].col = grid[i][j].col
-            if grid[i][j].col != grid2[i][j].col:
-                with self.canvas:
-                    Color(*colours[grid2[i][j].col])
-                    Rectangle(pos=(grid[i][j].x, grid[i][j].y), size=(grid[i][j].hori, grid[i][j].vert))
 
     for i in range(N):
         for j in range(M):
             grid[i][j] = grid2[i][j]
 
+    gen[0] += 1
     resetCanvas(self)
 
     Clock.schedule_once(partial(simulate,self),interval[0])
@@ -142,6 +151,9 @@ class Touch(Widget):
 
 class ToolBar(BoxLayout):
 
+    atext = StringProperty()
+    gtext = StringProperty()
+
     def spinner_clicked(self,value):
         if value=='Live':
             colour[0] = 1
@@ -150,10 +162,12 @@ class ToolBar(BoxLayout):
 
     def sim(self):
         running[0] = 1
+        gen[0] = 0
         simulate(self.children[0])
 
     def clear(self):
         running[0] = 0
+        gen[0] = 0
         for i in grid:
             for j in i:
                 j.col = 0
@@ -161,7 +175,7 @@ class ToolBar(BoxLayout):
 
     def randomize(self):
         running[0] = 0
-        print ("YES")
+        gen[0] = 0
         for i in grid:
             for j in i:
                 if randint(1,3)==1:
