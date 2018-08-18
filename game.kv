@@ -1,5 +1,6 @@
 #: import Spinner kivy.uix.spinner
 #: import Slider kivy.uix.slider
+#: import CheckBox kivy.uix.checkbox
 
 ToolBar:
 
@@ -29,11 +30,11 @@ ToolBar:
         size_hint: None,None
         width: '120dp'
     Button:
-        text: "Clear Grid"
+        text: "Reset"
         on_press: root.clear()
         height: '35dp'
         size_hint: None,None
-        width: '100dp'
+        width: '80dp'
     Button:
         text: "Simulate!"
         on_press: root.sim()
@@ -41,22 +42,17 @@ ToolBar:
         size_hint: None,None
         width: '90dp'
     Label:
-        text: "Alive: "
+        text: "Alive: "+root.atext+"\nGeneration: "+root.gtext
+        size_hint: None,None
+        height: '35dp'
+        width: '130dp'
+    Label:
+        text: "Wrap"
+        size_hint: None,None
+        height: '35dp'
+        width: '25dp'
+    CheckBox
+        on_active: root.wrap_check()
         size_hint: None,None
         height: '35dp'
         width: '50dp'
-    Label:
-        text: root.atext
-        size_hint: None,None
-        height: '35dp'
-        width: '20dp'
-    Label:
-        text: "Generation: "
-        size_hint: None,None
-        height: '35dp'
-        width: '100dp'
-    Label:
-        text: root.gtext
-        size_hint: None,None
-        height: '35dp'
-        width: '20dp'

@@ -9,6 +9,7 @@ from kivy.clock import Clock
 from functools import partial
 from kivy.config import Config
 from kivy.properties import StringProperty
+from kivy.uix.checkbox import CheckBox
 
 from random import randint
 import time
@@ -39,7 +40,7 @@ colour = [1]
 colours = [(1,1,1,1),(0,0,0,1)]
 
 interval = [0.1]
-wrap = [1]
+wrap = [0]
 rules = [2,3,3]
 
 
@@ -83,12 +84,7 @@ def updateBoard(self):
 
 def resetCanvas(self):
     self.canvas.clear()
-    #self.canvas.children = [widget.canvas for widget in self.children]
     updateBoard(self)
-    '''self.clear_widgets()
-    self.add_widget(Touch())
-    tools = ToolBar()
-    self.add_widget(tools)'''
 
 
 def simulate(self,*largs):
@@ -184,6 +180,11 @@ class ToolBar(BoxLayout):
                     j.col = 0
         resetCanvas(self.children[0])
 
+    def wrap_check(self):
+        if wrap[0]:
+            wrap[0] = 0
+        else:
+            wrap[0] = 1
 
 
 class GameApp(App):
